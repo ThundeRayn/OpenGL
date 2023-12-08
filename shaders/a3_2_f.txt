@@ -1,0 +1,51 @@
+#version 330 core
+
+struct PointLight{
+    vec3 position;
+    vec3 color;
+    float strength;
+};
+
+in vec3 fragmentNormal;
+in vec2 fragmentTex;
+in vec3 fragmentPos;
+
+uniform sampler2D s_texture;
+uniform PointLight Light;
+
+out vec4 color;
+
+vec3 calculatePointLight(PointLight light, vec3 fragmentPos, vec3 fragmentNormal);
+
+void main()
+{
+    vec3 temp = vec3(0.0);
+
+    temp += calculatePointLight(Light, fragmentPos,fragmentNormal);
+
+    color = vec4(temp,1.0);
+}
+
+vec3 calculatePointLight(PointLight light, vec3 fragmentPos, vec3 fragmentNormal){
+    vec3 baseTexture = texture(s_texture, fragmentTex).rgb;
+    vec3 result = vec3(0.0);
+
+    //geometric data
+    vec3 fragLight = light.position - fragmentPos;
+    float distance = length(fragLight);
+    fragLight= normalize(fragLight);
+
+    //ambient
+    result += 0.2*baseTexture;
+
+    //attenuation on diffuse light
+    //1.0/(kc + kl* distance + kq * distance *distance);
+    float attenuation = light.strength/(1 + (0.007*0.0001) * distance + (0.0002*0.0001) * distance *distance);
+    //float attenuation = light.strength/(1 + (0.35*0.0001) * distance + (0.44*0.0001) * distance *distance);
+
+
+    //diffuse
+    result += light.color * attenuation * max(0.0, dot(fragmentNormal, fragLight)) * baseTexture;
+
+    return result;
+}

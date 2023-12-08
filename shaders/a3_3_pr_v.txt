@@ -1,0 +1,21 @@
+#version 330 core
+
+layout (location=0) in vec3 vertexPos;
+layout (location=1) in vec2 vertexMat;
+layout (location=2) in vec3 vertexNorm;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+out vec3 fragmentNormal;
+out vec2 fragmentTex;
+out vec3 fragmentPos;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(vertexPos, 1.0);
+    fragmentNormal=mat3(model)*vertexNorm;
+    fragmentTex=vertexMat;
+    fragmentPos=(model*vec4(vertexPos,1.0)).xyz;
+}

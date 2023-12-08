@@ -1,0 +1,13 @@
+#version 330 core
+
+uniform vec3 object_color;
+
+in vec3 Normal;
+
+out vec4 color;
+
+void main()
+{
+    float c = dot(Normal, object_color);
+    color = vec4(c,c,c, 1.0);
+}
